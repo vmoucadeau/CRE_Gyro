@@ -157,7 +157,7 @@ discordclient.on(Events.InteractionCreate, async interaction => {
 		logger.info(interaction.user.username + " used the command gyro");
 		await interaction.deferReply();
 		ping_send = new Date();
-		mqttclient.publish(process.env.MQTT_GIROTOPICDOWN, "PING");
+		mqttclient.publish(process.env.MQTT_GIROTOPICDOWN, "ON");
 		last_interaction = interaction;
 		await (new Promise(resolve => setTimeout(resolve, 5000)));
 		if(last_interaction != null) {
