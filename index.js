@@ -29,7 +29,7 @@ const mqtt = require('mqtt');
 var mqtt_options = {
 	host: process.env.MQTT_HOST,
     port: process.env.MQTT_PORT,
-    clientId: 'girobot_discord',
+    clientId: process.env.MQTT_CLIENTID,
     username: process.env.MQTT_USER,
     password: process.env.MQTT_PASSWORD,
     keepalive: 60,
@@ -57,9 +57,7 @@ var giro_config = {
 
 /* SETTINGS DATA FORMAT
 giro_settings = {
-    bot_channelid = "15648155346845",
 	replies = ["Answer 1", "Answer 2"]
-	["J'allume le gyro", "La lumière fut.", "Oh ça toooouuuurne :zany_face:", "Ok Google, allume le gyro", "Avec ou sans sucre le café ?", "Lumos :mage:", "C'est parti pour la disco", "Ça fera un Ricard", "Chapô :person_gesturing_ok: C'est pas moi qui descends", "Ok boomer", "Ça se dit ingé mais ça connait pas la politesse", "Wesh dit stp la prochaine fois", "Aïe j'espère pour toi que quelqu'un va vouloir venir t'ouvrir ...", "À vos ordres mon capitaine !", "Tu t'es cru sur un tracteur ou quoi à m'allumer comme ça ?", "Toi tu manques pas de toupet", "\"Hey Alexa, allume le gyro\"", "\"Dis Siri, allume le gyro\""],
 }
 
 
@@ -145,11 +143,17 @@ discordclient.once(Events.ClientReady, readyClient => {
 
 discordclient.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
+	if(interaction.channelId != process.env.DISCORD_CHANNEL) {
+		logger.error(interaction.user.username + " used the wrong channel");
+		interaction.reply({content: "Utilise le bon channel stp.", ephemeral:true});
+		return;
+	}
 
 	const command = interaction.client.commands.get(interaction.commandName);
 
 	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
+		logger.error(`${interaction.commandName} used an unknown command ${interaction.commandName}`);
+		interaction.reply({content: "Je ne connais pas cette commande", ephemeral: true});
 		return;
 	}
 
